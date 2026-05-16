@@ -1,4 +1,4 @@
-// Game constants
+
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 400;
 const PADDLE_WIDTH = 10;
@@ -8,14 +8,14 @@ const PADDLE_SPEED = 6;
 const INITIAL_BALL_SPEED = 4;
 const MAX_BALL_SPEED = 7;
 
-// Game objects
+// Objects in game, with ball speed and score detection 
 const game = {
     playerScore: 0,
     computerScore: 0,
     gameRunning: true,
     ballSpeed: INITIAL_BALL_SPEED
 };
-
+// Left paddle dimensions and area
 const leftPaddle = {
     x: 10,
     y: (GAME_HEIGHT - PADDLE_HEIGHT) / 2,
@@ -23,7 +23,7 @@ const leftPaddle = {
     height: PADDLE_HEIGHT,
     dy: 0
 };
-
+// right paddle dimensions and area
 const rightPaddle = {
     x: GAME_WIDTH - PADDLE_WIDTH - 10,
     y: (GAME_HEIGHT - PADDLE_HEIGHT) / 2,
@@ -41,16 +41,16 @@ const ball = {
     speed: game.ballSpeed
 };
 
-// Keyboard input tracking
+// Tracking for keyboard input (up arrow and down arrow keys)
 const keys = {
     arrowUp: false,
     arrowDown: false
 };
 
-// Mouse tracking
+// Tracking user cursor
 let mouseY = GAME_HEIGHT / 2;
 
-// DOM elements
+// Doc obj model elements 
 const gameBoard = document.getElementById('gameBoard');
 const leftPaddleEl = document.getElementById('leftPaddle');
 const rightPaddleEl = document.getElementById('rightPaddle');
@@ -77,9 +77,9 @@ gameBoard.addEventListener('mousemove', (e) => {
 
 resetBtn.addEventListener('click', resetGame);
 
-// Update left paddle (player)
+// Update left paddle of player
 function updateLeftPaddle() {
-    // Use mouse position primarily, but allow arrow keys as alternative
+// Allow arrow keys as an alternative to playing with just the cursor
     let targetY = mouseY;
     
     if (keys.arrowUp) {
@@ -88,13 +88,13 @@ function updateLeftPaddle() {
         targetY = leftPaddle.y + PADDLE_SPEED;
     }
     
-    // Apply smooth movement towards target
+    // Add movement towards th target
     if (targetY !== undefined) {
         const diff = targetY - leftPaddle.y;
         leftPaddle.y += diff * 0.15; // Smooth movement
     }
     
-    // Boundary collision
+    // add the boundary collision mechanic so it doesn't just go off the screen
     if (leftPaddle.y < 0) leftPaddle.y = 0;
     if (leftPaddle.y + PADDLE_HEIGHT > GAME_HEIGHT) {
         leftPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
@@ -103,12 +103,12 @@ function updateLeftPaddle() {
     leftPaddleEl.style.top = leftPaddle.y + 'px';
 }
 
-// Update right paddle (computer AI)
+// Update the right paddle of the computer AI
 function updateRightPaddle() {
     const paddleCenter = rightPaddle.y + PADDLE_HEIGHT / 2;
     const ballCenter = ball.y + BALL_SIZE / 2;
     
-    // Simple AI: follow the ball with some lag
+    // Simple AI: follow the ball with a bit of lag/delay
     const difficulty = 0.04; // AI aggressiveness (0-1)
     
     if (ballCenter < paddleCenter - 35) {
@@ -117,7 +117,7 @@ function updateRightPaddle() {
         rightPaddle.y += PADDLE_SPEED * 0.8;
     }
     
-    // Boundary collision
+    // Boundary collision restraint
     if (rightPaddle.y < 0) rightPaddle.y = 0;
     if (rightPaddle.y + PADDLE_HEIGHT > GAME_HEIGHT) {
         rightPaddle.y = GAME_HEIGHT - PADDLE_HEIGHT;
@@ -126,12 +126,13 @@ function updateRightPaddle() {
     rightPaddleEl.style.top = rightPaddle.y + 'px';
 }
 
-// Update ball position
+// Update the ball positioning
 function updateBall() {
     ball.x += ball.dx;
     ball.y += ball.dy;
     
-    // Top and bottom wall collision
+    // Top + bottom wall collision so it doesn't float off the screen again
+        
     if (ball.y <= 0 || ball.y + BALL_SIZE >= GAME_HEIGHT) {
         ball.dy = -ball.dy;
         ball.y = Math.max(0, Math.min(ball.y, GAME_HEIGHT - BALL_SIZE));
@@ -146,11 +147,11 @@ function updateBall() {
         ball.dx = -ball.dx;
         ball.x = leftPaddle.x + leftPaddle.width;
         
-        // Add spin based on where ball hits paddle
+        // Add spin effect based on where the ball hits the paddle
         const hitPos = (ball.y + BALL_SIZE / 2 - (leftPaddle.y + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         ball.dy += hitPos * 2;
         
-        // Increase ball speed gradually
+        // Increase the ball speed gradually as it moves
         ball.speed = Math.min(ball.speed + 0.3, MAX_BALL_SPEED);
         ball.dx = Math.sign(ball.dx) * ball.speed;
         ball.dy = Math.sign(ball.dy) * Math.sqrt(ball.speed * ball.speed - ball.dx * ball.dx);
@@ -175,14 +176,14 @@ function updateBall() {
         ball.dy = Math.sign(ball.dy) * Math.sqrt(ball.speed * ball.speed - ball.dx * ball.dx);
     }
     
-    // Left wall (computer scores)
+    // Left wall hit impact means computer scores ,player loses point
     if (ball.x < 0) {
         game.computerScore++;
         computerScoreEl.textContent = game.computerScore;
         resetBall();
     }
     
-    // Right wall (player scores)
+        // Right wall means the player scores)l  
     if (ball.x > GAME_WIDTH) {
         game.playerScore++;
         playerScoreEl.textContent = game.playerScore;
@@ -207,7 +208,7 @@ function resetBall() {
     ballEl.style.top = ball.y + 'px';
 }
 
-// Reset entire game
+// Reset the whole game
 function resetGame() {
     game.playerScore = 0;
     game.computerScore = 0;
@@ -234,5 +235,5 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Start the game
+// Start  game
 gameLoop();
